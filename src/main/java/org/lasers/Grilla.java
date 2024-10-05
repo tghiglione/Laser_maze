@@ -1,42 +1,81 @@
 package org.lasers;
 
-public class Grilla {
-    private Celda[][] celdas;
-    private int filas;
-    private int columnas;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-    public Grilla(int filas, int columnas) {
-        this.filas = filas;
-        this.columnas = columnas;
-        this.celdas = new Celda[filas][columnas];
-        inicializarCeldas();
+public class Grilla {
+    private final Map<Posicion, Celda> celdas;
+    private final List<Emisor> emisores;
+    private final List<Objetivo> objetivos;
+
+    public Grilla() {
+        celdas = new HashMap<>();
+        emisores = new ArrayList<>();
+        objetivos = new ArrayList<>();
     }
 
-    private void inicializarCeldas() {          //inicializa una grilla con celdas sin piso ni bloque
-        for (int i = 0; i < filas; i++) {
-            for (int j = 0; j < columnas; j++) {
-                celdas[i][j] = new Celda();
+    public void agregarCelda(Celda celda) {
+        Posicion posicion = new Posicion(celda.getCoordenadaX(), celda.getCoordenadaY());
+        celdas.put(posicion, celda);
+    }
+
+    public Celda obtenerCeldaEnPosicion(Posicion posicion) {
+        return celdas.get(posicion);
+    }
+
+    public void agregarEmisor(Emisor emisor) {
+        emisores.add(emisor);
+    }
+
+    public List<Emisor> getEmisores() {
+        return emisores;
+    }
+
+    public void agregarObjetivo(Objetivo objetivo) {
+        objetivos.add(objetivo);
+    }
+    public List<Objetivo> getObjetivos() {
+        return objetivos;
+    }
+
+    public boolean todosObjetivosAlcanzados() {
+        for (Objetivo objetivo : objetivos) {
+            if (!objetivo.estaAlcanzado()) {
+                return false;
             }
         }
+        return true;
     }
 
-    public void colocarBloque(int fila, int columna, Bloque bloque) {
-        if (esPosicionValida(fila, columna) && celdas[fila][columna].puedeColocarBloque()) {        //si esta dentro de la grilla y es una celda con piso y vacia
-            celdas[fila][columna].colocarBloqueEnCelda(bloque);
+    public boolean moverBloque(Posicion origen, Posicion destino) {
+        Celda celdaOrigen = obtenerCeldaEnPosicion(origen);
+        Celda celdaDestino = obtenerCeldaEnPosicion(destino);
+
+        if (celdaOrigen == null || celdaDestino == null) {
+            return false;
         }
-    }
 
-    public void colocarPiso(int fila, int columna) {
-        if (esPosicionValida(fila, columna)) {
-            celdas[fila][columna].asignarPiso();
+        Bloque bloque = celdaOrigen.obtenerBloque();
+
+        if (bloque == null || !bloque.puedeMoverse()) {
+            return false;
         }
-    }
 
-    private boolean esPosicionValida(int fila, int columna) {
-        return fila >= 0 && fila < filas && columna >= 0 && columna < columnas;
+        if (celdaDestino.estaVacia()) {
+            try {
+                celdaDestino.colocarBloqueEnCelda(bloque);
+                celdaOrigen.removerBloque();
+                return true;
+            } catch (Exception e) {
+                // Manejo de excepciones si es necesario
+                return false;
+            }
+        }
+        return false;
     }
-
-    public Celda[][] getCeldas() {
+    public Map<Posicion, Celda> getCeldas() {
         return celdas;
     }
 }

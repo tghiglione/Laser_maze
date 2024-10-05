@@ -1,42 +1,69 @@
 package org.lasers;
 
 public class Celda {
+    private final int coordenadaX;
+    private  final int coordenadaY;
     private boolean tienePiso;
     private Bloque bloque;
 
-
-    public Celda() {
+    public Celda(int x, int y){
+        this.coordenadaX = x;
+        this.coordenadaY = y;
         this.tienePiso = false;
         this.bloque = null;
     }
 
-    public void asignarPiso() {
-        this.tienePiso = true;
+    //Pre: -
+    //Post: devuelve true si no tiene un bloque y tiene piso, false de lo contrario
+    public boolean estaVacia(){
+        return bloque == null && tienePiso;
     }
 
-    public void colocarBloqueEnCelda(Bloque bloque) {
-        if (tienePiso && bloque == null) {
+    //Pre: Debe ser un bloque valido
+    //Post: coloca un bloque en la celda con piso y vacia
+    public void colocarBloqueEnCelda(Bloque bloque) throws Exception{
+        if(estaVacia()){
             this.bloque = bloque;
+        }else{
+            throw new Exception("Celda invalida.");
         }
     }
 
-    public void removerBloque() {
-        if (this.bloque != null) {
+    //Pre: Debe haber un bloque en la celda
+    //Post: Quita el bloque de la celda y lo setea en null
+    public void removerBloque(){
+        if(this.bloque != null){
             this.bloque = null;
         }
     }
 
-    public void interactuarConLaser(Laser laser) {
+    //Pre:-
+    //Post: Define la interaccion del bloque con el laser
+    public void interactuarConLaser(Laser laser) throws Exception {
         if (bloque != null) {
             bloque.interactuarConLaser(laser);
         }
     }
 
-    public boolean estaVacia() {
-        return this.bloque == null;
+    //Pre:-
+    //Post: Asigna piso a una celda
+    public void asignarPisoEnCelda(boolean tienePiso) {
+        this.tienePiso = tienePiso;
     }
 
-    public boolean puedeColocarBloque() {
-        return tienePiso && bloque == null;
+    public int getCoordenadaX() {
+        return coordenadaX;
+    }
+
+    public int getCoordenadaY() {
+        return coordenadaY;
+    }
+
+    public Bloque obtenerBloque() {
+        return bloque;
+    }
+
+    public boolean celdaConPiso(){
+        return tienePiso;
     }
 }

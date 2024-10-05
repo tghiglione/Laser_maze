@@ -1,68 +1,67 @@
 package org.lasers;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Nivel {
     private Grilla grilla;
-    private List<EmisorLaser> emisores;
-    private List<Objetivo> objetivos;
-    private String archivoNivel;
 
-    public Nivel(String archivoNivel) throws Exception {
-        this.archivoNivel = archivoNivel;
-        this.emisores = new ArrayList<EmisorLaser>();
-        this.objetivos = new ArrayList<Objetivo>();
-        inicializarNivel();
+    public Nivel(InputStream rutaArchivo){
+        this.grilla = new Grilla();
+        cargarNivel(rutaArchivo);
     }
 
-    private void inicializarNivel() throws Exception {
-        List<String> lineas = leerArchivo(archivoNivel);
+    private void cargarNivel(InputStream rutaArchivo) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(rutaArchivo))){
+            List<String> seccionBloques = new ArrayList<>();
+            List<String> seccionEmisoresObjetivos = new ArrayList<>();
+            List<String> seccionActual = seccionBloques;
 
-        int filas = 0;
-        int columnas = 0;
-        for (String linea : lineas) {
-            if (linea.trim().isEmpty()) break;
-            filas++;
-            columnas = Math.max(columnas, linea.length());
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                linea = linea.trim();
+                if (linea.isEmpty()) {
+                    seccionActual = seccionEmisoresObjetivos;
+                    continue;
+                }
+                seccionActual.add(linea);
+            }
+
+            procesarSeccionBloques(seccionBloques);
+            procesarSeccionEmisoresObjetivos(seccionEmisoresObjetivos);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+    }
 
-        this.grilla = new Grilla(filas, columnas);
+    private void procesarSeccionBloques(List<String> seccionBloques) throws Exception {
+        int fila = 0;
 
-        for (int i = 0; i < filas; i++) {                   //armo la grilla con piso o bloque
-            String linea = lineas.get(i);
-            for (int j = 0; j < linea.length(); j++) {
-                char simbolo = linea.charAt(j);
-                if (simbolo == '.') {
-                    grilla.colocarPiso(i, j);
+        for (String linea : seccionBloques) {
+            for (int columna = 0; columna < linea.length(); columna++) {
+                char simbolo = linea.charAt(columna);
+                Posicion posicion = new Posicion(columna, fila);
+
+                if(simbolo == '.'){
+                    Celda celdaVacia = new Celda(columna, fila);
+                    celdaVacia.asignarPisoEnCelda(true);
+                    grilla.agregarCelda(celdaVacia);
                 } else if (simbolo != ' ') {
-                    Bloque tipoDeBloque = crearBloque(simbolo);
-                    grilla.colocarBloque(i, j, tipoDeBloque);
+                    Celda celdaConBloque = new Celda(columna, fila);
+                    celdaConBloque.asignarPisoEnCelda(true);
+                    Bloque bloque = crearBloquePorSimbolo(simbolo);
+                    celdaConBloque.colocarBloqueEnCelda(bloque);
+                    grilla.agregarCelda(celdaConBloque);
                 }
             }
-        }
-
-        for (int i = filas + 1; i < lineas.size(); i++) {       //coloco emisor y objetivo en la grilla
-            String[] partes = lineas.get(i).split(" "); //armo array con las partes [E,0,1,SE] o [G,8.0] para crear emisor u objetivo
-            if (partes[0].equals("E")) {
-                emisores.add(new EmisorLaser(
-                        Integer.parseInt(partes[1]),
-                        Integer.parseInt(partes[2]),
-                        partes[3])
-                );
-            } else if (partes[0].equals("G")) {
-                objetivos.add(new Objetivo(
-                        Integer.parseInt(partes[1]),
-                        Integer.parseInt(partes[2]))
-                );
-            }
+            fila++;
         }
     }
 
-    private Bloque crearBloque(char tipo) throws Exception {
-        switch (tipo) {
+    private Bloque crearBloquePorSimbolo(char simbolo) {
+        switch (simbolo) {
             case 'F':
                 return new BloqueOpacoFijo();
             case 'B':
@@ -74,15 +73,34 @@ public class Nivel {
             case 'C':
                 return new BloqueCristal();
             default:
-                throw new Exception("Tipo de bloque no válido");
+                throw new IllegalArgumentException("Símbolo de bloque desconocido: " + simbolo);
         }
     }
 
-    private List<String> leerArchivo(String archivoNivel) throws Exception {
-        try {
-            return Files.readAllLines(Paths.get(archivoNivel));
-        } catch (Exception e) {
-            throw new Exception("Error al leer el archivo: " + e);
+    private void procesarSeccionEmisoresObjetivos(List<String> seccionEmisoresObjetivos) {
+        for (String linea : seccionEmisoresObjetivos) {
+            linea = linea.trim();
+            if (linea.isEmpty()) {
+                continue; // saltearse líneas vacías
+            }
+            String[] partes = linea.split(" ");
+            switch (partes[0]) {
+                case "E":
+                    int xEmisor = Integer.parseInt(partes[1]);
+                    int yEmisor = Integer.parseInt(partes[2]);
+                    Direccion direccionEmisor = Direccion.desdeArchivo(partes[3]);
+                    Emisor emisor = new Emisor(new Posicion(xEmisor, yEmisor), direccionEmisor);
+                    grilla.agregarEmisor(emisor);
+                    break;
+                case "G": // Objetivo
+                    int xObjetivo = Integer.parseInt(partes[1]);
+                    int yObjetivo = Integer.parseInt(partes[2]);
+                    Objetivo objetivo = new Objetivo(new Posicion(xObjetivo, yObjetivo));
+                    grilla.agregarObjetivo(objetivo);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
@@ -90,13 +108,7 @@ public class Nivel {
         return grilla;
     }
 
-    public List<EmisorLaser> getEmisores() {
-        return emisores;
-    }
 
-    public List<Objetivo> getObjetivos() {
-        return objetivos;
-    }
 }
 
 
