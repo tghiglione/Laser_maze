@@ -20,7 +20,6 @@ public class Nivel {
 
             String linea;
             while ((linea = br.readLine()) != null) {
-                linea = linea.trim();
                 if (linea.isEmpty()) {
                     seccionActual = seccionEmisoresObjetivos;
                     continue;
@@ -79,7 +78,6 @@ public class Nivel {
 
     private void procesarSeccionEmisoresObjetivos(List<String> seccionEmisoresObjetivos) {
         for (String linea : seccionEmisoresObjetivos) {
-            linea = linea.trim();
             if (linea.isEmpty()) {
                 continue; // saltearse líneas vacías
             }

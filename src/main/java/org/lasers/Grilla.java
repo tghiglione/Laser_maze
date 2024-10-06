@@ -49,7 +49,7 @@ public class Grilla {
         return true;
     }
 
-    public boolean moverBloque(Posicion origen, Posicion destino) {
+    public boolean moverBloque(Posicion origen, Posicion destino) throws Exception {
         Celda celdaOrigen = obtenerCeldaEnPosicion(origen);
         Celda celdaDestino = obtenerCeldaEnPosicion(destino);
 
@@ -64,14 +64,10 @@ public class Grilla {
         }
 
         if (celdaDestino.estaVacia()) {
-            try {
-                celdaDestino.colocarBloqueEnCelda(bloque);
-                celdaOrigen.removerBloque();
-                return true;
-            } catch (Exception e) {
-                // Manejo de excepciones si es necesario
-                return false;
-            }
+            celdaDestino.colocarBloqueEnCelda(bloque);
+            celdaOrigen.removerBloque();
+            return true;
+
         }
         return false;
     }
