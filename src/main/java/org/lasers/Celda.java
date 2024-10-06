@@ -21,11 +21,9 @@ public class Celda {
 
     //Pre: Debe ser un bloque valido
     //Post: coloca un bloque en la celda con piso y vacia
-    public void colocarBloqueEnCelda(Bloque bloque) throws Exception{
+    public void colocarBloqueEnCelda(Bloque bloque) {
         if(estaVacia()){
             this.bloque = bloque;
-        }else{
-            throw new Exception("Celda invalida.");
         }
     }
 

@@ -1,5 +1,7 @@
 package org.lasers;
 
+import java.util.Objects;
+
 public class Posicion {
     private final int x;
     private final int y;
@@ -38,6 +40,10 @@ public class Posicion {
         if (!(obj instanceof Posicion)) return false;
         Posicion other = (Posicion) obj;
         return this.x == other.x && this.y == other.y;
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }
 
