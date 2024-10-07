@@ -2,16 +2,19 @@ package org.lasers;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ControladorNiveles {
 
-    private final int CANTIDAD_NIVELES = 6;
+    public static final int CANTIDAD_NIVELES = 6;
 
     private List<Nivel> Niveles;
     private List<Grilla> Grillas;
 
     public ControladorNiveles() throws Exception {
+        Niveles = new ArrayList<Nivel>();
+        Grillas = new ArrayList<Grilla>();
         cargarNivelesGrillas();
     }
 
@@ -24,14 +27,14 @@ public class ControladorNiveles {
     }
 
     public Nivel obtenerNivel(int numeroNivel){
-        return Niveles.get(numeroNivel);
+        return Niveles.get(numeroNivel - 1);
     };
 
     public Grilla obtenerGrilla(int numeroGrilla){
-        return Grillas.get(numeroGrilla);
+        return Grillas.get(numeroGrilla - 1);
     }
 
-    private void cargarNivelesGrillas() throws FileNotFoundException {
+    private void cargarNivelesGrillas() throws Exception {
         for (int i = 1; i <= CANTIDAD_NIVELES;i++) {
 
             String rutaNivel = "/level" + i + ".dat";
