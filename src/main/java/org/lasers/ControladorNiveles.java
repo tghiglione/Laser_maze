@@ -2,9 +2,7 @@ package org.lasers;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ControladorNiveles {
 
@@ -13,9 +11,8 @@ public class ControladorNiveles {
     private List<Nivel> Niveles;
     private List<Grilla> Grillas;
 
-    public ControladorNiveles() {
-        cargarNiveles();
-        cargarGrillas();
+    public ControladorNiveles() throws Exception {
+        cargarNivelesGrillas();
     }
 
     public List<Nivel> obtenerNiveles(){
@@ -26,23 +23,25 @@ public class ControladorNiveles {
         return Grillas;
     }
 
-    public Nivel obtenerNivel(int nivel){
-        return Niveles.get(nivel);
+    public Nivel obtenerNivel(int numeroNivel){
+        return Niveles.get(numeroNivel);
     };
 
-    public Grilla obtenerGrilla(int grilla){
-        return Grillas.get(grilla);
+    public Grilla obtenerGrilla(int numeroGrilla){
+        return Grillas.get(numeroGrilla);
     }
 
-    private void cargarNiveles() {
+    private void cargarNivelesGrillas() throws FileNotFoundException {
         for (int i = 1; i <= CANTIDAD_NIVELES;i++) {
-            String rutaNivel = "/level" + i + ".dat";
-            Niveles.add(new Nivel(getClass().getResourceAsStream(rutaNivel)));
-        }
-    }
 
-    private void cargarGrillas() {
-        for (Nivel nivel : Niveles) {
+            String rutaNivel = "/level" + i + ".dat";
+            InputStream nivelStream = getClass().getResourceAsStream(rutaNivel);
+            if (nivelStream == null) {
+                throw new FileNotFoundException("El archivo level" + i + ".dat no se encontró.");
+            }
+
+            Nivel nivel = new Nivel(nivelStream);
+            Niveles.add(nivel);
             Grillas.add(nivel.getGrilla());
         }
     }
