@@ -30,8 +30,8 @@ public class ControladorNiveles {
         return Niveles.get(numeroNivel - 1);
     };
 
-    public Grilla obtenerGrilla(int numeroGrilla){
-        return Grillas.get(numeroGrilla - 1);
+    public Grilla obtenerGrilla(int numeroNivel){
+        return Grillas.get(numeroNivel - 1);
     }
 
     private void cargarNivelesGrillas() throws Exception {

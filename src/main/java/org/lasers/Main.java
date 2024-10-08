@@ -5,14 +5,18 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.*;
+import java.util.List;
+
+import static org.lasers.ControladorNiveles.CANTIDAD_NIVELES;
 
 public class Main extends Application {
     private static final int TAMANO_CELDA = 50;
@@ -34,26 +38,55 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        InputStream nivelStream = getClass().getResourceAsStream("/level1.dat");
-        if (nivelStream == null) {
-            throw new FileNotFoundException("El archivo level2.dat no se encontró.");
+
+        ControladorNiveles controladorNiveles = new ControladorNiveles();
+        List<StackPane> interfacesNiveles = obtenerInterfacesNiveles(controladorNiveles);
+        StackPane interfazNivelDefault = obtenerInterfazNivel(controladorNiveles,1);
+        List<Button> botones = new ArrayList<>();
+
+        var root = new HBox();
+        var vBoxBotones = new VBox();
+
+        for (int i = 1; i <= CANTIDAD_NIVELES ;i++) {
+            botones.add(new Button("Nivel " + i));
+            vBoxBotones.getChildren().add(botones.get(i - 1));
         }
-        Nivel nivel = new Nivel(nivelStream);
-        grilla = nivel.getGrilla();
+        root.getChildren().addAll(interfazNivelDefault, vBoxBotones);
 
-        int numFilas = obtenerNumeroDeFilas(grilla);
-        int numColumnas = obtenerNumeroDeColumnas(grilla);
+        botones.get(0).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 1));
+            }
+        });
 
-        Canvas canvas = new Canvas((numColumnas + 1) * TAMANO_CELDA, (numFilas + 1) * TAMANO_CELDA);
-        gc = canvas.getGraphicsContext2D();
+        botones.get(1).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 2));
+            }
+        });
 
-        dibujarJuego(gc, grilla);
+        botones.get(2).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 3));
+            }
+        });
 
-        canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
-        canvas.setOnMouseDragged(event -> manejarMouseDragged(event));
-        canvas.setOnMouseReleased(event -> manejarMouseReleased(event, grilla, gc));
+        botones.get(3).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 4));
+            }
+        });
+        botones.get(5).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 6));
+            }
+        });
+        botones.get(4).setOnAction(e -> {
+            if (root.getChildren().size() > 1) {
+                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 5));
+            }
+        });
 
-        StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Juego Lasers");
@@ -119,6 +152,33 @@ public class Main extends Application {
             gc.setFill(Color.VIOLET);
             gc.fillOval(x - RADIO_EMISOR, y - RADIO_EMISOR, RADIO_EMISOR * 2, RADIO_EMISOR * 2);
         }
+    }
+
+    private List<StackPane> obtenerInterfacesNiveles(ControladorNiveles controladorNiveles){
+        List<StackPane> interfaces = new ArrayList<>();
+        List<Grilla> grillas = controladorNiveles.obtenerGrillas();
+
+        for (Grilla grilla : grillas) {
+            int numFilas = obtenerNumeroDeFilas(grilla);
+            int numColumnas = obtenerNumeroDeColumnas(grilla);
+
+            Canvas canvas = new Canvas((numColumnas + 1) * TAMANO_CELDA, (numFilas + 1) * TAMANO_CELDA);
+            gc = canvas.getGraphicsContext2D();
+
+            dibujarJuego(gc, grilla);
+
+            canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
+            canvas.setOnMouseDragged(event -> manejarMouseDragged(event));
+            canvas.setOnMouseReleased(event -> manejarMouseReleased(event, grilla, gc));
+
+            StackPane ventanaGrilla = new StackPane(canvas);
+            interfaces.add(ventanaGrilla);
+        }
+        return interfaces;
+    }
+
+    private StackPane obtenerInterfazNivel(ControladorNiveles controladorNiveles, final int numeroNivel){
+        return obtenerInterfacesNiveles(controladorNiveles).get(numeroNivel - 1);
     }
 
     private void manejarMousePressed(MouseEvent event, Grilla grilla) {
