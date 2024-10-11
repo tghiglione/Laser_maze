@@ -1,6 +1,6 @@
 package org.lasers;
 
-public class BloqueEspejo implements Bloque {
+public class BloqueEspejo extends Bloque {
     @Override
     public boolean puedeMoverse() {
         return true;
@@ -9,7 +9,8 @@ public class BloqueEspejo implements Bloque {
     @Override
     public void interactuarConLaser(Laser laser) throws Exception {
         Direccion direccionActual = laser.getDireccion();
-        Direccion nuevaDireccion = direccionActual.direccionReflejada();
+        Posicion posicionLaser = laser.getPosicionActual();
+        Direccion nuevaDireccion = direccionActual.direccionReflejada(posicionLaser, direccionActual);
         laser.cambiarDireccion(nuevaDireccion);
     }
 }

@@ -1,6 +1,6 @@
 package org.lasers;
 
-public class BloqueVidrio implements Bloque {
+public class BloqueVidrio extends Bloque {
     @Override
     public boolean puedeMoverse() {
         return true;
@@ -9,7 +9,8 @@ public class BloqueVidrio implements Bloque {
     @Override
     public void interactuarConLaser(Laser laser) throws Exception {
         Direccion direccionActual = laser.getDireccion();
-        Direccion direccionReflejada = direccionActual.direccionReflejada();
+        Posicion posicionLaser = laser.getPosicionActual();
+        Direccion direccionReflejada = direccionActual.direccionReflejada(posicionLaser, direccionActual);
         Laser laserReflejado = new Laser(laser.getPosicionActual(), direccionReflejada);
         GestorLasers.obtenerInstancia().agregarLaser(laserReflejado);
     }

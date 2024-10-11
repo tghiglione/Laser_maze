@@ -38,7 +38,8 @@ public class Celda {
     //Pre:-
     //Post: Define la interaccion del bloque con el laser
     public void interactuarConLaser(Laser laser) throws Exception {
-        if (bloque != null) {
+        if (obtenerBloque() != null) {
+            System.out.println("ingresa porque hay bloque: "+ obtenerBloque());
             bloque.interactuarConLaser(laser);
         }
     }

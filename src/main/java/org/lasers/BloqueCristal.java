@@ -1,11 +1,11 @@
 package org.lasers;
 
-public class BloqueCristal implements Bloque {
+public class BloqueCristal extends Bloque {
+
     @Override
     public boolean puedeMoverse() {
-        return true; // Puede moverse
+        return true;
     }
-
     @Override
     public void interactuarConLaser(Laser laser) throws Exception {
         Posicion puntoEntrada = laser.getPosicionActual();

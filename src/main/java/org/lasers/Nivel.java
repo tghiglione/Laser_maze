@@ -41,7 +41,6 @@ public class Nivel {
         for (String linea : seccionBloques) {
             for (int columna = 0; columna < linea.length(); columna++) {
                 char simbolo = linea.charAt(columna);
-                Posicion posicion = new Posicion(columna, fila);
 
                 if(simbolo == '.'){
                     Celda celdaVacia = new Celda(columna, fila);
@@ -51,6 +50,20 @@ public class Nivel {
                     Celda celdaConBloque = new Celda(columna, fila);
                     celdaConBloque.asignarPisoEnCelda(true);
                     Bloque bloque = crearBloquePorSimbolo(simbolo);
+                    List<Posicion> posicionesLogicas = new ArrayList<>();
+                    Posicion centro = new Posicion(columna * 2 + 1, fila * 2 + 1);
+                    Posicion arriba = new Posicion(columna * 2 + 1, fila * 2);
+                    Posicion abajo = new Posicion(columna * 2 + 1, fila * 2 + 2);
+                    Posicion izquierda = new Posicion(columna * 2, fila * 2 + 1);
+                    Posicion derecha = new Posicion(columna * 2 + 2, fila * 2 + 1);
+
+                    posicionesLogicas.add(centro);
+                    posicionesLogicas.add(arriba);
+                    posicionesLogicas.add(abajo);
+                    posicionesLogicas.add(izquierda);
+                    posicionesLogicas.add(derecha);
+                    bloque.setPosicionesLogicas(posicionesLogicas);
+
                     celdaConBloque.colocarBloqueEnCelda(bloque);
                     grilla.agregarCelda(celdaConBloque);
                 }

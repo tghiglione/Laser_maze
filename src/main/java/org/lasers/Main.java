@@ -5,18 +5,14 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.*;
-import java.util.List;
-
-import static org.lasers.ControladorNiveles.CANTIDAD_NIVELES;
 
 public class Main extends Application {
     private static final int TAMANO_CELDA = 50;
@@ -38,55 +34,27 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-        ControladorNiveles controladorNiveles = new ControladorNiveles();
-        List<StackPane> interfacesNiveles = obtenerInterfacesNiveles(controladorNiveles);
-        StackPane interfazNivelDefault = obtenerInterfazNivel(controladorNiveles,1);
-        List<Button> botones = new ArrayList<>();
-
-        var root = new HBox();
-        var vBoxBotones = new VBox();
-
-        for (int i = 1; i <= CANTIDAD_NIVELES ;i++) {
-            botones.add(new Button("Nivel " + i));
-            vBoxBotones.getChildren().add(botones.get(i - 1));
+        InputStream nivelStream = getClass().getResourceAsStream("/level5.dat");
+        if (nivelStream == null) {
+            throw new FileNotFoundException("El archivo level2.dat no se encontró.");
         }
-        root.getChildren().addAll(interfazNivelDefault, vBoxBotones);
+        Nivel nivel = new Nivel(nivelStream);
+        grilla = nivel.getGrilla();
+        GestorLasers gestorLasers = GestorLasers.obtenerInstancia();
+        gestorLasers.inicializarLasersDesdeEmisores(grilla.getEmisores());
+        int numFilas = obtenerNumeroDeFilas(grilla);
+        int numColumnas = obtenerNumeroDeColumnas(grilla);
 
-        botones.get(0).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 1));
-            }
-        });
+        Canvas canvas = new Canvas((numColumnas + 1) * TAMANO_CELDA, (numFilas + 1) * TAMANO_CELDA);
+        gc = canvas.getGraphicsContext2D();
 
-        botones.get(1).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 2));
-            }
-        });
+        dibujarJuego(gc, grilla);
 
-        botones.get(2).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 3));
-            }
-        });
+        canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
+        //canvas.setOnMouseDragged(event -> manejarMouseDragged(event));
+        canvas.setOnMouseReleased(event -> manejarMouseReleased(event, grilla, gc));
 
-        botones.get(3).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 4));
-            }
-        });
-        botones.get(5).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 6));
-            }
-        });
-        botones.get(4).setOnAction(e -> {
-            if (root.getChildren().size() > 1) {
-                root.getChildren().set(0,obtenerInterfazNivel(controladorNiveles, 5));
-            }
-        });
-
+        StackPane root = new StackPane(canvas);
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Juego Lasers");
@@ -112,20 +80,16 @@ public class Main extends Application {
 
             if (celda.obtenerBloque() != null) {
                 Bloque bloque = celda.obtenerBloque();
+                System.out.println("el bloque: "+bloque+ " en la celda: ("+celda.getCoordenadaX() +"," +celda.getCoordenadaY()+") tiene las posiciones: "+bloque.getPosicionesLogicas());
                 Color colorBloque = obtenerColorDeBloque(bloque);
 
-                double bloqueX = x + TAMANO_CELDA * 0.25;
-                double bloqueY = y + TAMANO_CELDA * 0.25;
-                double bloqueAncho = TAMANO_CELDA * 0.5;
-                double bloqueAlto = TAMANO_CELDA * 0.5;
-
                 gc.setFill(colorBloque);
-                gc.fillRect(bloqueX, bloqueY, bloqueAncho, bloqueAlto);
+                gc.fillRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
                 gc.setStroke(Color.BLACK);
-                gc.strokeRect(bloqueX, bloqueY, bloqueAncho, bloqueAlto);
+                gc.strokeRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
 
                 if (bloque.puedeMoverse()) {
-                    Rectangle2D areaBloque = new Rectangle2D(bloqueX, bloqueY, bloqueAncho, bloqueAlto);
+                    Rectangle2D areaBloque = new Rectangle2D(x, y, TAMANO_CELDA, TAMANO_CELDA);
                     bloquesMoviles.add(new BloqueMovil(bloque, posicion, areaBloque));
                 }
             }
@@ -152,33 +116,27 @@ public class Main extends Application {
             gc.setFill(Color.VIOLET);
             gc.fillOval(x - RADIO_EMISOR, y - RADIO_EMISOR, RADIO_EMISOR * 2, RADIO_EMISOR * 2);
         }
-    }
+        GestorLasers gestorLasers = GestorLasers.obtenerInstancia();
+        gestorLasers.actualizarLasers(grilla);
+        gc.setStroke(Color.RED); // Establece el color del láser
+        gc.setLineWidth(2); // Define el grosor de la línea del láser
 
-    private List<StackPane> obtenerInterfacesNiveles(ControladorNiveles controladorNiveles){
-        List<StackPane> interfaces = new ArrayList<>();
-        List<Grilla> grillas = controladorNiveles.obtenerGrillas();
+        for (Laser laser : gestorLasers.getLasersActivos()) {
+            List<Posicion> trayectoria = laser.getTrayectoria();
 
-        for (Grilla grilla : grillas) {
-            int numFilas = obtenerNumeroDeFilas(grilla);
-            int numColumnas = obtenerNumeroDeColumnas(grilla);
+            for (int i = 0; i < trayectoria.size() - 1; i++) {
+                Posicion origen = trayectoria.get(i);
+                Posicion destino = trayectoria.get(i + 1);
 
-            Canvas canvas = new Canvas((numColumnas + 1) * TAMANO_CELDA, (numFilas + 1) * TAMANO_CELDA);
-            gc = canvas.getGraphicsContext2D();
+                double xOrigen = origen.getX() * ((double) TAMANO_CELDA / 2);
+                double yOrigen = origen.getY() *  ((double) TAMANO_CELDA / 2);
+                double xDestino = destino.getX() * ((double) TAMANO_CELDA / 2);
+                double yDestino = destino.getY() *  ((double) TAMANO_CELDA / 2);
 
-            dibujarJuego(gc, grilla);
-
-            canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
-            canvas.setOnMouseDragged(event -> manejarMouseDragged(event));
-            canvas.setOnMouseReleased(event -> manejarMouseReleased(event, grilla, gc));
-
-            StackPane ventanaGrilla = new StackPane(canvas);
-            interfaces.add(ventanaGrilla);
+                gc.strokeLine(xOrigen, yOrigen, xDestino, yDestino);
+            }
         }
-        return interfaces;
-    }
 
-    private StackPane obtenerInterfazNivel(ControladorNiveles controladorNiveles, final int numeroNivel){
-        return obtenerInterfacesNiveles(controladorNiveles).get(numeroNivel - 1);
     }
 
     private void manejarMousePressed(MouseEvent event, Grilla grilla) {
@@ -196,31 +154,30 @@ public class Main extends Application {
         }
     }
 
-    private void manejarMouseDragged(MouseEvent event) {
-        if (bloqueArrastrado != null) {
-            double x = event.getX() - offsetX;
-            double y = event.getY() - offsetY;
-
-            dibujarJuego(gc, grilla);
-
-            gc.setFill(obtenerColorDeBloque(bloqueArrastrado));
-            gc.fillRect(x, y, TAMANO_CELDA * 0.5, TAMANO_CELDA * 0.5);
-            gc.setStroke(Color.BLACK);
-            gc.strokeRect(x, y, TAMANO_CELDA * 0.5, TAMANO_CELDA * 0.5);
-        }
-    }
+//    private void manejarMouseDragged(MouseEvent event) {
+//        if (bloqueArrastrado != null) {
+//            double x = event.getX() - offsetX;
+//            double y = event.getY() - offsetY;
+//
+//            //dibujarJuego(gc, grilla);
+//
+//            gc.setFill(obtenerColorDeBloque(bloqueArrastrado));
+//            gc.fillRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
+//            gc.setStroke(Color.BLACK);
+//            gc.strokeRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
+//        }
+//    }
 
     private void manejarMouseReleased(MouseEvent event, Grilla grilla, GraphicsContext gc) {
         if (bloqueArrastrado != null) {
+
             double x = event.getX() - offsetX + TAMANO_CELDA * 0.25;
             double y = event.getY() - offsetY + TAMANO_CELDA * 0.25;
 
             int columna = (int) ((x + TAMANO_CELDA * 0.25) / TAMANO_CELDA);
             int fila = (int) ((y + TAMANO_CELDA * 0.25) / TAMANO_CELDA);
+            grilla.moverBloque(bloqueArrastrado,columna,fila);
             Posicion posicionDestino = new Posicion(columna, fila);
-
-            System.out.println("Mouse Released at x: " + x + ", y: " + y);
-            System.out.println("Calculated column: " + columna + ", row: " + fila);
 
             Celda celdaDestino = grilla.obtenerCeldaEnPosicion(posicionDestino);
 
@@ -235,7 +192,6 @@ public class Main extends Application {
             dibujarJuego(gc, grilla);
         }
     }
-
 
     private Color obtenerColorDeBloque(Bloque bloque) {
         if (bloque instanceof BloqueOpacoFijo) {

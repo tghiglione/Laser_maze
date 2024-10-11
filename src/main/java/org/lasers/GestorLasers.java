@@ -1,7 +1,9 @@
 package org.lasers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class GestorLasers {
     private static GestorLasers instancia;
@@ -35,31 +37,43 @@ public class GestorLasers {
     }
 
     public void actualizarLasers(Grilla grilla) {
-        List<Laser> lasersParaRemover = new ArrayList<>();
         for (Laser laser : lasersActivos) {
-            if (!laser.estaActivo()) {
-                lasersParaRemover.add(laser);
-                continue;
-            }
+            laser.reiniciarTrayectoria();
+        }
+        Iterator<Laser> iterador = lasersActivos.iterator();
+        while (iterador.hasNext()) {
+            Laser laser = iterador.next();
             try {
-                laser.avanzar();
-                Celda celda = grilla.obtenerCeldaEnPosicion(laser.getPosicionActual());
-                if (celda != null) {
-                    celda.interactuarConLaser(laser);
-                } else {
-                    laser.detener();
-                }
+                int contador = 0;
+                while (contador < 8) {
+                    Posicion posIni = laser.getPosicionActual();
+                    System.out.println("Pos inicial: " + posIni);
+                    laser.avanzar();
+                    Posicion posActual = laser.getPosicionActual();
+                    System.out.println("Pos actual: " + posActual);
 
-                for (Objetivo objetivo : objetivos) {
-                    objetivo.verificarImpacto(laser);
+                    for (Celda celda : grilla.obtenerTodasLasCeldas()) {
+                        Bloque bloque = celda.obtenerBloque();
+                        if (bloque != null) {
+                            List<Posicion> posicionesBloque = bloque.getPosicionesLogicas();
+                            if (posicionesBloque.contains(posActual)) {
+                                bloque.interactuarConLaser(laser);
+                                break;
+                            }
+                        }
+                    }
+
+                    for (Objetivo objetivo : grilla.getObjetivos()) {
+                        objetivo.verificarImpacto(laser);
+                    }
+
+                    contador++;
                 }
             } catch (Exception e) {
-                laser.detener();
-                lasersParaRemover.add(laser);
-
+                System.out.println("Error: " + e.getMessage());
+                iterador.remove();
             }
         }
-        lasersActivos.removeAll(lasersParaRemover);
     }
 
     public List<Laser> getLasersActivos() {

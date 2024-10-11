@@ -1,12 +1,9 @@
 package org.lasers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Grilla {
-    private final Map<Posicion, Celda> celdas;
+    private final Map<Posicion, Celda> celdas;                  //para poder renderizar la grilla
     private final List<Emisor> emisores;
     private final List<Objetivo> objetivos;
 
@@ -49,30 +46,28 @@ public class Grilla {
         return true;
     }
 
-    public boolean moverBloque(Posicion origen, Posicion destino) throws Exception {
-        Celda celdaOrigen = obtenerCeldaEnPosicion(origen);
-        Celda celdaDestino = obtenerCeldaEnPosicion(destino);
+    public void moverBloque(Bloque bloque, int nuevaColumna, int nuevaFila) {
+        List<Posicion> nuevasPosicionesLogicas = new ArrayList<>();
+        Posicion centro = new Posicion(nuevaColumna * 2 + 1, nuevaFila * 2 + 1);
+        Posicion arriba = new Posicion(nuevaColumna * 2 + 1, nuevaFila * 2);
+        Posicion abajo = new Posicion(nuevaColumna * 2 + 1, nuevaFila * 2 + 2);
+        Posicion izquierda = new Posicion(nuevaColumna * 2, nuevaFila * 2 + 1);
+        Posicion derecha = new Posicion(nuevaColumna * 2 + 2, nuevaFila * 2 + 1);
 
-        if (celdaOrigen == null || celdaDestino == null) {
-            return false;
-        }
+        nuevasPosicionesLogicas.add(centro);
+        nuevasPosicionesLogicas.add(arriba);
+        nuevasPosicionesLogicas.add(abajo);
+        nuevasPosicionesLogicas.add(izquierda);
+        nuevasPosicionesLogicas.add(derecha);
 
-        Bloque bloque = celdaOrigen.obtenerBloque();
+        bloque.setPosicionesLogicas(nuevasPosicionesLogicas);
 
-        if (bloque == null || !bloque.puedeMoverse()) {
-            return false;
-        }
-
-        if (celdaDestino.estaVacia()) {
-            celdaDestino.colocarBloqueEnCelda(bloque);
-            celdaOrigen.removerBloque();
-            return true;
-
-        }
-        return false;
     }
     public Map<Posicion, Celda> getCeldas() {
         return celdas;
+    }
+    public Collection<Celda> obtenerTodasLasCeldas() {
+        return celdas.values();
     }
 }
 
