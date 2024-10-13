@@ -3,19 +3,13 @@ package org.lasers;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class GestorLasers {
     private static GestorLasers instancia;
     private List<Laser> lasersActivos;
-    private List<Objetivo> objetivos;
 
     private GestorLasers() {
         lasersActivos = new ArrayList<>();
-    }
-
-    public void setObjetivos(List<Objetivo> objetivos) {
-        this.objetivos = objetivos;
     }
 
     public static GestorLasers obtenerInstancia() {
@@ -36,21 +30,21 @@ public class GestorLasers {
         lasersActivos.add(laser);
     }
 
-    public void actualizarLasers(Grilla grilla) {
+    public boolean chequearGanador(Grilla grilla) {
         for (Laser laser : lasersActivos) {
             laser.reiniciarTrayectoria();
         }
+        for (Objetivo objetivo : grilla.getObjetivos()) {
+            objetivo.setAlcanzado(false);
+        }
+
         Iterator<Laser> iterador = lasersActivos.iterator();
         while (iterador.hasNext()) {
             Laser laser = iterador.next();
             try {
-                int contador = 0;
-                while (contador < 8) {
-                    Posicion posIni = laser.getPosicionActual();
-                    System.out.println("Pos inicial: " + posIni);
+                while (laser.estaActivo()) {
                     laser.avanzar();
                     Posicion posActual = laser.getPosicionActual();
-                    System.out.println("Pos actual: " + posActual);
 
                     for (Celda celda : grilla.obtenerTodasLasCeldas()) {
                         Bloque bloque = celda.obtenerBloque();
@@ -62,18 +56,24 @@ public class GestorLasers {
                             }
                         }
                     }
-
                     for (Objetivo objetivo : grilla.getObjetivos()) {
-                        objetivo.verificarImpacto(laser);
+                        if (objetivo.getPosicionObjetivo().equals(posActual)) {
+                            objetivo.setAlcanzado(true);
+                        }
                     }
-
-                    contador++;
+                    if(grilla.todosObjetivosAlcanzados()){
+                        laser.detener();
+                    }
+                    if(!grilla.estaDentroDeLimites(posActual)){
+                        laser.detener();
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
                 iterador.remove();
             }
         }
+        return grilla.todosObjetivosAlcanzados();
     }
 
     public List<Laser> getLasersActivos() {

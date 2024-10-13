@@ -3,7 +3,7 @@ package org.lasers;
 import java.util.*;
 
 public class Grilla {
-    private final Map<Posicion, Celda> celdas;                  //para poder renderizar la grilla
+    private final Map<Posicion, Celda> celdas;
     private final List<Emisor> emisores;
     private final List<Objetivo> objetivos;
 
@@ -68,6 +68,31 @@ public class Grilla {
     }
     public Collection<Celda> obtenerTodasLasCeldas() {
         return celdas.values();
+    }
+    private int numeroDeFilas() {
+        int maxFila = 0;
+        for (Posicion posicion : celdas.keySet()) {
+            if (posicion.getY() > maxFila) {
+                maxFila = posicion.getY();
+            }
+        }
+        return (maxFila + 1)*2;
+    }
+
+    private int numeroDeColumnas() {
+        int maxColumna = 0;
+        for (Posicion posicion : celdas.keySet()) {
+            if (posicion.getX() > maxColumna) {
+                maxColumna = posicion.getX();
+            }
+        }
+        return (maxColumna + 1)*2;
+    }
+
+    public boolean estaDentroDeLimites(Posicion posicion) {
+        int x = posicion.getX();
+        int y = posicion.getY();
+        return x >= 0 && x < numeroDeColumnas() && y >= 0 && y < numeroDeFilas();
     }
 }
 

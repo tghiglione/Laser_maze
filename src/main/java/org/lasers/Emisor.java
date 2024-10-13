@@ -13,10 +13,6 @@ public class Emisor {
         return new Laser(posicion, direccion);
     }
 
-    public Direccion getDireccionEmisor() {
-        return direccion;
-    }
-
     public Posicion getPosicionEmisor() {
         return posicion;
     }

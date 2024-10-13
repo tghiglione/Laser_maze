@@ -103,7 +103,7 @@ public class Nivel {
                     Emisor emisor = new Emisor(new Posicion(xEmisor, yEmisor), direccionEmisor);
                     grilla.agregarEmisor(emisor);
                     break;
-                case "G": // Objetivo
+                case "G":
                     int xObjetivo = Integer.parseInt(partes[1]);
                     int yObjetivo = Integer.parseInt(partes[2]);
                     Objetivo objetivo = new Objetivo(new Posicion(xObjetivo, yObjetivo));

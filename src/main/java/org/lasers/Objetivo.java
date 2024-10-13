@@ -9,17 +9,14 @@ public class Objetivo {
         this.esAlcanzado = false;
     }
 
-    public void verificarImpacto(Laser laser) {
-        if (!esAlcanzado && laser.getPosicionActual().equals(posicion)) {
-            esAlcanzado = true;
-        }
-    }
-
     public boolean estaAlcanzado(){
         return esAlcanzado;
     }
 
     public Posicion getPosicionObjetivo() {
         return posicion;
+    }
+    public void setAlcanzado(boolean alcanzado){
+        esAlcanzado = alcanzado;
     }
 }

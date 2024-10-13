@@ -1,16 +1,14 @@
 package org.lasers;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -26,6 +24,7 @@ public class Main extends Application {
 
     private GraphicsContext gc;
     private Grilla grilla;
+    private Label labelEstado;
 
     private Bloque bloqueArrastrado = null;
     private Posicion posicionBloqueArrastrado = null;
@@ -54,6 +53,9 @@ public class Main extends Application {
         Canvas canvas = new Canvas((numColumnas + 1) * TAMANO_CELDA, (numFilas + 1) * TAMANO_CELDA);
         gc = canvas.getGraphicsContext2D();
 
+        labelEstado = new Label("");
+        labelEstado.setStyle("-fx-font-size: 30px; -fx-text-fill: green; -fx-font-weight: bold;");
+
         dibujarJuego(gc, grilla);
 
         canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
@@ -69,9 +71,11 @@ public class Main extends Application {
             buttonBox.getChildren().add(button);
         }
 
-        HBox root = new HBox(10);
-        root.setPadding(new Insets(10));
-        root.getChildren().addAll(canvas, buttonBox);
+        HBox nivelBox = new HBox(10);
+        nivelBox.getChildren().addAll(canvas, buttonBox);
+
+        VBox root = new VBox(10);
+        root.getChildren().addAll(nivelBox, labelEstado);
 
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
@@ -82,6 +86,7 @@ public class Main extends Application {
         GestorLasers gestorLasersActual = GestorLasers.obtenerInstancia();
         gestorLasersActual.eliminarTodosLosLasers();
         gestorLasersActual.finalizarGestor();
+        labelEstado.setText("");
 
         Nivel nuevoNivel = ControladorNiveles.obtenerInstancia().cargarNivel(nivelNumero);
         grilla = nuevoNivel.getGrilla();
@@ -148,7 +153,7 @@ public class Main extends Application {
             gc.fillOval(x - RADIO_EMISOR, y - RADIO_EMISOR, RADIO_EMISOR * 2, RADIO_EMISOR * 2);
         }
         GestorLasers gestorLasers = GestorLasers.obtenerInstancia();
-        gestorLasers.actualizarLasers(grilla);
+        boolean ganoJuego = gestorLasers.chequearGanador(grilla);
         gc.setStroke(Color.RED);
         gc.setLineWidth(2);
 
@@ -166,6 +171,9 @@ public class Main extends Application {
 
                 gc.strokeLine(xOrigen, yOrigen, xDestino, yDestino);
             }
+        }
+        if (ganoJuego){
+            labelEstado.setText("¡Ganaste!");
         }
 
     }
@@ -278,6 +286,4 @@ public class Main extends Application {
         }
     }
 }
-
-
 
