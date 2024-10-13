@@ -1,18 +1,24 @@
 package org.lasers;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.List;
 
 public class Main extends Application {
     private static final int TAMANO_CELDA = 50;
@@ -34,9 +40,9 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        InputStream nivelStream = getClass().getResourceAsStream("/level5.dat");
+        InputStream nivelStream = getClass().getResourceAsStream("/level1.dat");
         if (nivelStream == null) {
-            throw new FileNotFoundException("El archivo level2.dat no se encontró.");
+            throw new FileNotFoundException("El archivo level1.dat no se encontró.");
         }
         Nivel nivel = new Nivel(nivelStream);
         grilla = nivel.getGrilla();
@@ -51,15 +57,41 @@ public class Main extends Application {
         dibujarJuego(gc, grilla);
 
         canvas.setOnMousePressed(event -> manejarMousePressed(event, grilla));
-        //canvas.setOnMouseDragged(event -> manejarMouseDragged(event));
         canvas.setOnMouseReleased(event -> manejarMouseReleased(event, grilla, gc));
 
-        StackPane root = new StackPane(canvas);
+        VBox buttonBox = new VBox(10);
+
+        for (int i = 1; i <= 6; i++) {
+            Button button = new Button("Nivel " + i);
+            button.setMinWidth(100);
+            int nivelNumero = i;
+            button.setOnAction(event -> cargarNivel(nivelNumero));
+            buttonBox.getChildren().add(button);
+        }
+
+        HBox root = new HBox(10);
+        root.setPadding(new Insets(10));
+        root.getChildren().addAll(canvas, buttonBox);
+
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Juego Lasers");
         primaryStage.show();
     }
+    private void cargarNivel(int nivelNumero) {
+        GestorLasers gestorLasersActual = GestorLasers.obtenerInstancia();
+        gestorLasersActual.eliminarTodosLosLasers();
+        gestorLasersActual.finalizarGestor();
+
+        Nivel nuevoNivel = ControladorNiveles.obtenerInstancia().cargarNivel(nivelNumero);
+        grilla = nuevoNivel.getGrilla();
+
+        GestorLasers nuevoGestorLasers = GestorLasers.obtenerInstancia();
+        nuevoGestorLasers.inicializarLasersDesdeEmisores(grilla.getEmisores());
+
+        dibujarJuego(gc, grilla);
+    }
+
 
     private void dibujarJuego(GraphicsContext gc, Grilla grilla) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
@@ -80,7 +112,6 @@ public class Main extends Application {
 
             if (celda.obtenerBloque() != null) {
                 Bloque bloque = celda.obtenerBloque();
-                System.out.println("el bloque: "+bloque+ " en la celda: ("+celda.getCoordenadaX() +"," +celda.getCoordenadaY()+") tiene las posiciones: "+bloque.getPosicionesLogicas());
                 Color colorBloque = obtenerColorDeBloque(bloque);
 
                 gc.setFill(colorBloque);
@@ -118,8 +149,8 @@ public class Main extends Application {
         }
         GestorLasers gestorLasers = GestorLasers.obtenerInstancia();
         gestorLasers.actualizarLasers(grilla);
-        gc.setStroke(Color.RED); // Establece el color del láser
-        gc.setLineWidth(2); // Define el grosor de la línea del láser
+        gc.setStroke(Color.RED);
+        gc.setLineWidth(2);
 
         for (Laser laser : gestorLasers.getLasersActivos()) {
             List<Posicion> trayectoria = laser.getTrayectoria();
@@ -154,20 +185,6 @@ public class Main extends Application {
         }
     }
 
-//    private void manejarMouseDragged(MouseEvent event) {
-//        if (bloqueArrastrado != null) {
-//            double x = event.getX() - offsetX;
-//            double y = event.getY() - offsetY;
-//
-//            //dibujarJuego(gc, grilla);
-//
-//            gc.setFill(obtenerColorDeBloque(bloqueArrastrado));
-//            gc.fillRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
-//            gc.setStroke(Color.BLACK);
-//            gc.strokeRect(x, y, TAMANO_CELDA, TAMANO_CELDA);
-//        }
-//    }
-
     private void manejarMouseReleased(MouseEvent event, Grilla grilla, GraphicsContext gc) {
         if (bloqueArrastrado != null) {
 
@@ -199,11 +216,11 @@ public class Main extends Application {
         } else if (bloque instanceof BloqueOpacoMovil) {
             return Color.DARKGRAY;
         } else if (bloque instanceof BloqueEspejo) {
-            return Color.SILVER;
+            return Color.STEELBLUE;
         } else if (bloque instanceof BloqueVidrio) {
-            return Color.LIGHTBLUE;
+            return Color.WHITESMOKE;
         } else if (bloque instanceof BloqueCristal) {
-            return Color.CYAN;
+            return Color.LIGHTBLUE;
         } else {
             return Color.PINK;
         }

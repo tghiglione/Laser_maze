@@ -8,10 +8,34 @@ public class BloqueVidrio extends Bloque {
 
     @Override
     public void interactuarConLaser(Laser laser) throws Exception {
-        Direccion direccionActual = laser.getDireccion();
-        Posicion posicionLaser = laser.getPosicionActual();
-        Direccion direccionReflejada = direccionActual.direccionReflejada(posicionLaser, direccionActual);
-        Laser laserReflejado = new Laser(laser.getPosicionActual(), direccionReflejada);
-        GestorLasers.obtenerInstancia().agregarLaser(laserReflejado);
+        Posicion puntoEntrada = laser.getPosicionActual();
+        Direccion direccion = laser.getDireccion();
+        Posicion puntoSalida = calcularPuntoSalida(puntoEntrada, direccion);
+        laser.setPosicionActual(puntoSalida);
+//        Direccion direccionActual = laser.getDireccion();
+//        Posicion posicionLaser = laser.getPosicionActual();
+//        Direccion direccionReflejada = direccionActual.direccionReflejada(posicionLaser, direccionActual);
+//        Laser laserReflejado = new Laser(laser.getPosicionActual(), direccionReflejada);
+//        GestorLasers.obtenerInstancia().agregarLaser(laserReflejado);
+    }
+
+    private Posicion calcularPuntoSalida(Posicion puntoEntrada, Direccion direccionActual){
+
+        int xEntrada = puntoEntrada.getX();
+        int yEntrada = puntoEntrada.getY();
+
+        Posicion posicionFinal = null;
+
+        if (direccionActual == Direccion.SE) {
+            posicionFinal = new Posicion(xEntrada + 1, yEntrada + 1);
+        } else if (direccionActual == Direccion.NE) {
+            posicionFinal = new Posicion(xEntrada + 1, yEntrada - 1);
+        } else if (direccionActual == Direccion.SW) {
+            posicionFinal = new Posicion(xEntrada -1, yEntrada + 1);
+        } else if (direccionActual == Direccion.NW) {
+            posicionFinal = new Posicion(xEntrada - 1, yEntrada - 1);
+        }
+
+        return posicionFinal;
     }
 }

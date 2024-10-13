@@ -34,7 +34,7 @@ public enum Direccion {
             if (esXPar && !esYPar) {
                 direccionFinal = NE;
             } else if (!esXPar && esYPar) {
-                direccionFinal = SE;
+                direccionFinal = SW;
             }
         }
 

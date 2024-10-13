@@ -79,5 +79,11 @@ public class GestorLasers {
     public List<Laser> getLasersActivos() {
         return new ArrayList<>(lasersActivos);
     }
+    public void eliminarTodosLosLasers() {
+        lasersActivos.clear();
+    }
+    public void finalizarGestor() {
+        instancia = null;
+    }
 }
 
