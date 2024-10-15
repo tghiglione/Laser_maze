@@ -22,6 +22,8 @@ public class Laser {
         trayectoria.add(posicionInicial);
     }
 
+    //Pre: -
+    //Post: Avanza la posicion del laser en determinada direccion
     public void avanzar() throws Exception {
         if (!activo) return;
         Posicion nuevaPos = posicionActual.posicionAdyacente(direccion);
@@ -29,41 +31,47 @@ public class Laser {
         setPosicionActual(nuevaPos);
 
     }
-
+    //Pre: -
+    //Post: detiene el laser
     public void detener() {
         this.activo = false;
     }
 
+    //Pre: -
+    //Post: Cambia la direccion del laser
     public void cambiarDireccion(Direccion nuevaDireccion) {
         this.direccion = nuevaDireccion;
     }
 
+    //Pre: -
+    //Post: devuelve la direccion actual del laser
     public Direccion getDireccion() {
         return direccion;
     }
 
+    //Pre: -
+    //Post: devuelve la posicion actual del laser
     public Posicion getPosicionActual() {
         return posicionActual;
     }
 
+    //Pre: -
+    //Post: ccambia la posicion actual del laser
     public void setPosicionActual(Posicion nuevaPosicion) {
         this.posicionActual = nuevaPosicion;
     }
 
+    //Pre: -
+    //Post: devuelve true si el laser esta activo o false si esta detenido
     public boolean estaActivo() {
         return activo;
     }
 
+    //Pre: -
+    //Post: devuelve la trayectoria del laser, osea las posiciones que ese laser paso
     public List<Posicion> getTrayectoria() {
         return new ArrayList<>(trayectoria);
     }
 
-    public void reiniciarTrayectoria() {
-        trayectoria.clear();
-        posicionActual = posicionInicial;
-        direccion=direccionInicial;
-        this.activo = true;
-        trayectoria.add(posicionActual);
-    }
 }
 

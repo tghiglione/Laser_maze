@@ -10,7 +10,8 @@ public class Posicion {
         this.x = x;
         this.y = y;
     }
-
+    //Pre: -
+    //Post: devuelve la nueva posicion adyacente del laser segun la direccion
     public Posicion posicionAdyacente(Direccion direccion) throws Exception{
         switch (direccion) {
             case NE:
@@ -25,11 +26,13 @@ public class Posicion {
                 throw new Exception("Dirección desconocida");
         }
     }
-
+    //Pre: -
+    //Post: devuelve la coordenada x
     public int getX() {
         return x;
     }
-
+    //Pre: debe haber una celda valida
+    //Post: devuelve la coordenada y
     public int getY() {
         return y;
     }

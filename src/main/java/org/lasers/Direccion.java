@@ -3,6 +3,8 @@ package org.lasers;
 public enum Direccion {
     NE, NW, SE, SW;
 
+    //Pre: -
+    //Post: devuelve la direccion reflejada segun la direccion con la que impacta el laser y la direccion que este tiene
     public Direccion direccionReflejada(Posicion posicionActual, Direccion direccionActual){
         int posicionX = posicionActual.getX();
         int posicionY = posicionActual.getY();
@@ -37,11 +39,11 @@ public enum Direccion {
                 direccionFinal = SW;
             }
         }
-
         return direccionFinal;
-
     }
 
+    //Pre: tiene que tener una direccion valida en el archivo
+    //Post: devuelve la direccion en el formato esperado
     public static Direccion desdeArchivo(String direccionStr) {
         switch (direccionStr.toUpperCase()) {
             case "NE":

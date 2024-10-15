@@ -9,10 +9,14 @@ public class Emisor {
         this.direccion = direccion;
     }
 
+    //Pre: -
+    //Post: devuelve un laser que se posiciona en el emisor
     public Laser emitirLaser() {
         return new Laser(posicion, direccion);
     }
 
+    //Pre: -
+    //Post: devuelve la posicion del emisor
     public Posicion getPosicionEmisor() {
         return posicion;
     }

@@ -12,12 +12,10 @@ public class BloqueVidrio extends Bloque {
         Direccion direccion = laser.getDireccion();
         Posicion puntoSalida = calcularPuntoSalida(puntoEntrada, direccion);
         laser.setPosicionActual(puntoSalida);
-
-        Direccion direccionReflejada = direccion.direccionReflejada(puntoEntrada, direccion);
-        Laser laserReflejado = new Laser(puntoEntrada, direccionReflejada);
-        GestorLasers.obtenerInstancia().agregarLaser(laserReflejado);
     }
 
+    //Pre: -
+    //Post: devuelve la posicion final al interactuar con el bloque
     private Posicion calcularPuntoSalida(Posicion puntoEntrada, Direccion direccionActual){
 
         int xEntrada = puntoEntrada.getX();

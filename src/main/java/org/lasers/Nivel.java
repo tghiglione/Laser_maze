@@ -12,6 +12,8 @@ public class Nivel {
         cargarNivel(rutaArchivo);
     }
 
+    //Pre: debe ser una ruta correcta al archivo
+    //Post: carga el nivel con los bloques, emisores y objetivos
     private void cargarNivel(InputStream rutaArchivo) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(rutaArchivo))){
             List<String> seccionBloques = new ArrayList<>();
@@ -35,6 +37,8 @@ public class Nivel {
         }
     }
 
+    //Pre: -
+    //Post: procesa las celdas y bloques segun el archivo de texto
     private void procesarSeccionBloques(List<String> seccionBloques) throws Exception {
         int fila = 0;
 
@@ -72,6 +76,8 @@ public class Nivel {
         }
     }
 
+    //Pre: -
+    //Post: Devuelve el bloque segun el simbolo del archivo
     private Bloque crearBloquePorSimbolo(char simbolo) {
         switch (simbolo) {
             case 'F':
@@ -89,10 +95,12 @@ public class Nivel {
         }
     }
 
+    //Pre: -
+    //Post: procesa objetivos y emisores segun el archivo de texto
     private void procesarSeccionEmisoresObjetivos(List<String> seccionEmisoresObjetivos) {
         for (String linea : seccionEmisoresObjetivos) {
             if (linea.isEmpty()) {
-                continue; // saltearse líneas vacías
+                continue;
             }
             String[] partes = linea.split(" ");
             switch (partes[0]) {
@@ -115,11 +123,11 @@ public class Nivel {
         }
     }
 
+    //Pre: -
+    //Post: devuelve la grilla creada
     public Grilla getGrilla() {
         return grilla;
     }
-
-
 }
 
 

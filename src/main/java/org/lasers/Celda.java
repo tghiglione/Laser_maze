@@ -36,32 +36,28 @@ public class Celda {
     }
 
     //Pre:-
-    //Post: Define la interaccion del bloque con el laser
-    public void interactuarConLaser(Laser laser) throws Exception {
-        if (obtenerBloque() != null) {
-            System.out.println("ingresa porque hay bloque: "+ obtenerBloque());
-            bloque.interactuarConLaser(laser);
-        }
-    }
-
-    //Pre:-
     //Post: Asigna piso a una celda
     public void asignarPisoEnCelda(boolean tienePiso) {
         this.tienePiso = tienePiso;
     }
 
+    //Pre: debe haber una celda valida
+    //Post: devuelve la coordenada x
     public int getCoordenadaX() {
         return coordenadaX;
     }
-
+    //Pre: debe haber una celda valida
+    //Post: devuelve la coordenada y
     public int getCoordenadaY() {
         return coordenadaY;
     }
-
+    //Pre: -
+    //Post: devuelve el bloque o null si no lo hay
     public Bloque obtenerBloque() {
         return bloque;
     }
-
+    //Pre: -
+    //Post: devuelve true si tiene piso osea que puede haber un bloque, false si no lo tiene
     public boolean celdaConPiso(){
         return tienePiso;
     }

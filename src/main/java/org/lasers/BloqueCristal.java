@@ -14,6 +14,8 @@ public class BloqueCristal extends Bloque {
         laser.setPosicionActual(puntoSalida);
     }
 
+    //Pre: -
+    //Post: devuelve la posicion de salida al interactuar con el bloque
     private Posicion calcularPuntoSalida(Posicion puntoEntrada, Direccion direccionActual){
 
         int xEntrada = puntoEntrada.getX();

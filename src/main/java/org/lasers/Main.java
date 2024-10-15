@@ -82,6 +82,9 @@ public class Main extends Application {
         primaryStage.setTitle("Juego Lasers");
         primaryStage.show();
     }
+
+    //Pre: debe ser un numero de nivel valido
+    //Post: crea el nivel en un estado inicial
     private void cargarNivel(int nivelNumero) {
         GestorLasers gestorLasersActual = GestorLasers.obtenerInstancia();
         gestorLasersActual.eliminarTodosLosLasers();
@@ -97,7 +100,8 @@ public class Main extends Application {
         dibujarJuego(gc, grilla);
     }
 
-
+    //Pre: -
+    //Post: renderiza el juego con los bloques, emisores, objetivos y laser
     private void dibujarJuego(GraphicsContext gc, Grilla grilla) {
         gc.clearRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());
         bloquesMoviles.clear();
@@ -130,7 +134,6 @@ public class Main extends Application {
                 }
             }
         }
-
         // Dibujar emisores
         for (Emisor emisor : grilla.getEmisores()) {
             Posicion posicion = emisor.getPosicionEmisor();
@@ -141,7 +144,6 @@ public class Main extends Application {
             gc.setFill(Color.RED);
             gc.fillOval(x - RADIO_EMISOR, y - RADIO_EMISOR, RADIO_EMISOR * 2, RADIO_EMISOR * 2);
         }
-
         // Dibujar objetivos
         for (Objetivo objetivo : grilla.getObjetivos()) {
             Posicion posicion = objetivo.getPosicionObjetivo();
@@ -175,9 +177,10 @@ public class Main extends Application {
         if (ganoJuego){
             labelEstado.setText("¡Ganaste!");
         }
-
     }
 
+    //Pre: -
+    //Post: Maneja el drag de los bloques moviles
     private void manejarMousePressed(MouseEvent event, Grilla grilla) {
         double x = event.getX();
         double y = event.getY();
@@ -193,6 +196,8 @@ public class Main extends Application {
         }
     }
 
+    //Pre: -
+    //Post: Maneja el drop de los bloques moviles
     private void manejarMouseReleased(MouseEvent event, Grilla grilla, GraphicsContext gc) {
         if (bloqueArrastrado != null) {
 
@@ -218,6 +223,8 @@ public class Main extends Application {
         }
     }
 
+    //Pre: tiene que ser un bloque valido
+    //Post: Indica el color de los bloques
     private Color obtenerColorDeBloque(Bloque bloque) {
         if (bloque instanceof BloqueOpacoFijo) {
             return Color.BLACK;
@@ -234,6 +241,8 @@ public class Main extends Application {
         }
     }
 
+    //Pre: -
+    //Post: devuelve las filas de la grilla
     private int obtenerNumeroDeFilas(Grilla grilla) {
         int maxFila = 0;
         for (Posicion posicion : grilla.getCeldas().keySet()) {
@@ -254,6 +263,8 @@ public class Main extends Application {
         return maxFila;
     }
 
+    //Pre: -
+    //Post: devuelve las columnas de la grilla
     private int obtenerNumeroDeColumnas(Grilla grilla) {
         int maxColumna = 0;
         for (Posicion posicion : grilla.getCeldas().keySet()) {
@@ -279,6 +290,7 @@ public class Main extends Application {
         Posicion posicion;
         Rectangle2D area;
 
+        //Constructor
         public BloqueMovil(Bloque bloque, Posicion posicion, Rectangle2D area) {
             this.bloque = bloque;
             this.posicion = posicion;
